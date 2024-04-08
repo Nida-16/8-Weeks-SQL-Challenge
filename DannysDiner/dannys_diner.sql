@@ -84,7 +84,8 @@ WITH points_cte AS
 (SELECT s.customer_id AS cust_id, 
 CASE 
 	WHEN m.product_name='sushi' THEN m.price*20 
-	ELSE m.price*10 END AS points
+	ELSE m.price*10 
+END AS points
 FROM sales AS s JOIN menu AS m
 ON s.product_id = m.product_id)
 SELECT  cust_id, SUM(points) 
@@ -100,7 +101,8 @@ WITH points_cte AS
 CASE
 	WHEN s.order_date BETWEEN members.join_date AND members.join_date+6 THEN m.price*20
 	WHEN m.product_name='sushi' THEN m.price*20
-	ELSE m.price*10 END AS points
+	ELSE m.price*10 
+END AS points
 FROM sales AS s JOIN menu AS m
 ON s.product_id = m.product_id
 JOIN members
@@ -109,3 +111,40 @@ SELECT  cust_id, SUM(points)
 FROM points_cte
 WHERE order_date <= '2021-01-31'
 GROUP BY cust_id;
+
+
+-- ------------------------------------- Bonus Questions ---------------------------------------------
+
+-- Q11 Join All The Things
+SELECT s.customer_id, s.order_date, menu.product_name, menu.price,
+CASE 
+	WHEN m.join_date IS NULL THEN 'N'
+	WHEN s.order_date < m.join_date THEN 'N'
+	ELSE 'Y'
+END AS member
+FROM sales AS s LEFT JOIN members AS m 
+ON s.customer_id = m.customer_id
+JOIN menu 
+ON s.product_id = menu.product_id
+ORDER BY s.customer_id, s.order_date, menu.product_name; 
+
+
+-- Q12 Rank All The Things
+WITH date_cte AS 
+(SELECT s.customer_id, s.order_date, menu.product_name, menu.price,
+CASE 
+	WHEN m.join_date IS NULL THEN 'N'
+	WHEN s.order_date < m.join_date THEN 'N'
+	ELSE 'Y'
+END AS member
+FROM sales AS s LEFT JOIN members AS m 
+ON s.customer_id = m.customer_id
+JOIN menu 
+ON s.product_id = menu.product_id
+ORDER BY s.customer_id, s.order_date, menu.product_name)
+SELECT * ,
+CASE 
+	WHEN member = 'N' THEN NULL
+	ELSE  RANK() OVER(PARTITION BY s.customer_id, member ORDER BY s.order_date)
+END AS ranking 
+FROM date_cte;
