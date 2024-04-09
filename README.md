@@ -4,6 +4,7 @@ My submissions to the **[#8WeekSQLChallenge](https://8weeksqlchallenge.com)**.
 
 This repository contains solutions to the 8 Case studies revolving around SQL curated by [Danny Ma](https://www.linkedin.com/in/datawithdanny/)
 
+- Todo : [ ] Define foreign key relationships
 
 ## 📖 Table of Contents :
 
